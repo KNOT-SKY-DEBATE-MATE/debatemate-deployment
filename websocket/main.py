@@ -12,6 +12,7 @@ from fastapi.websockets import (
 # Create FastAPI application
 application = FastAPI()
 
+
 @dataclasses.dataclass
 class Connection:
 
@@ -20,6 +21,7 @@ class Connection:
     """
 
     websockets: set[WebSocket] = dataclasses.field(default_factory=set)
+
 
 # Websocket connection registry
 connections: defaultdict[str, defaultdict[uuid.UUID, Connection]] =\
@@ -38,7 +40,7 @@ async def onconnect(
     # WebSocket connection
     connection_id: uuid.UUID = Path(...),
 ):
-  
+
     # Check if namespace is permitted
     if namespace not in {"group", "meeting"}:
 
@@ -80,7 +82,6 @@ async def onconnect(
             connections.pop(namespace)
 
 
-# WebSocket message endpoint
 @application.post("/on/{namespace}/{connection_id}/{command}/")
 async def onmessage(
 
@@ -96,7 +97,7 @@ async def onmessage(
     # Check if namespace is permitted
     if any([
         namespace not in {"group", "meeting"},
-        command not in {"message"}
+        command not in {"message.create"}
     ]):
         # Close WebSocket connection
         await websocket.close()
