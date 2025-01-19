@@ -7,9 +7,9 @@ services:
     depends_on:
       - django
     environment:
-      NGINX_SERVER_NAME: ${NGINX_SERVER_NAME}
-      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
-      CERTBOT_STAGING: ${CERTBOT_STAGING}
+      - NGINX_SERVER_NAME=${NGINX_SERVER_NAME}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - CERTBOT_STAGING=${CERTBOT_STAGING}
     ports:
       - "80:80"
       - "443:443"
@@ -24,7 +24,7 @@ services:
     environment:
       - REDIS_DB=${REDIS_DB}
       - REDIS_HOST=redis
-      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
       - "6379:6379"
@@ -36,11 +36,21 @@ services:
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+
+  websocket:
+    build:
+      context: ./websocket
+    container_name: websocket
+    environment:
+      - WEBSOCKET_HOST=websocket
+      - WEBSOCKET_PORT=8001
+    ports:
+      - "8001:8001"
 
   django:
     build:
@@ -49,14 +59,12 @@ services:
     depends_on:
       - redis
       - postgres
+      - websocket
     environment:
       - DJANGO_HOST=django
-      - DJANGO_PORT=${DJANGO_PORT}
+      - DJANGO_PORT=8000
       - DJANGO_ADMIN=${DJANGO_ADMIN}
       - DJANGO_ADMIN_EMAIL=${DJANGO_ADMIN_EMAIL}
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      - DJANGO_DEBUG=${DJANGO_DEBUG}
-      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
       - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
       - DJANGO_ASGI_MODULE=${DJANGO_ASGI_MODULE}
       - DJANGO_WSGI_MODULE=${DJANGO_WSGI_MODULE}
@@ -69,8 +77,10 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - REDIS_DB=${REDIS_DB}
       - REDIS_HOST=redis
-      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - WEBSOCKET_HOST=websocket
+      - WEBSOCKET_PORT=8001
     ports:
       - "8000:8000"
     command: >
