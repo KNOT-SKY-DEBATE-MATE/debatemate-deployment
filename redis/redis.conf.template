@@ -1,0 +1,16 @@
+bind ${REDIS_HOST}
+port ${REDIS_PORT}
+daemonize no
+logfile /var/log/redis/redis.log
+loglevel notice
+dir /data
+save 900 1
+save 300 10
+save 60 10000
+dbfilename dump.rdb
+requirepass ${REDIS_PASSWORD}
+maxclients 10000
+protected-mode yes
+appendonly yes
+appendfilename "appendonly.aof"
+appendfsync everysec

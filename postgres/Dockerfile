@@ -1,5 +1,3 @@
-# PostgreSQL ベースイメージ
-FROM postgres:15
-
-# 初期化スクリプトをコピー
-COPY init.sql /docker-entrypoint-initdb.d/
+FROM postgres:15-alpine
+USER root
+CMD ["postgres"]
