@@ -1,5 +1,4 @@
 services:
-
   nginx:
     build:
       context: ./nginx
@@ -26,8 +25,6 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-    ports:
-      - "6379:6379"
 
   postgres:
     build:
@@ -39,8 +36,6 @@ services:
       - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
 
   websocket:
     build:
@@ -53,8 +48,6 @@ services:
     build:
       context: ./annotator
     container_name: annotator
-    ports:
-      - "8002:8002"
 
   django:
     build:
@@ -88,8 +81,6 @@ services:
       - WEBSOCKET_PORT=8001
       - ANNOTATOR_HOST=annotator
       - ANNOTATOR_PORT=8002
-    ports:
-      - "8000:8000"
 
 volumes:
   certbot-data:

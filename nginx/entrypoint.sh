@@ -6,13 +6,11 @@ if [ -z "$NGINX_SERVER_NAME" ] || [ -z "$CERTBOT_EMAIL" ]; then
 fi
 
 if [ ! -f "/etc/letsencrypt/live/$NGINX_SERVER_NAME/fullchain.pem" ]; then
-  certbot certonly --nginx \
-    --non-interactive \
-    --agree-tos \
-    --email "$CERTBOT_EMAIL" \
-    -d "$NGINX_SERVER_NAME" \
-    ${CERTBOT_STAGING:+--staging}
+  certbot certonly --nginx --non-interactive --agree-tos --email "$CERTBOT_EMAIL" -d "$NGINX_SERVER_NAME" ${CERTBOT_STAGING:+--staging} || { echo "Certbot failed"; exit 1; }
 fi
 
+certbot renew --non-interactive --quiet || { echo "Renewal failed"; exit 1; }
+
 envsubst '${NGINX_SERVER_NAME}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+
 nginx -g "daemon off;"
