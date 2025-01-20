@@ -1,0 +1,5 @@
+python-decouple
+fastapi
+uvicorn[standard]
+openai
+pydantic

@@ -1,60 +1,44 @@
 events {}
 
 http {
-    # 基本設定
     include       mime.types;
     default_type  application/octet-stream;
     sendfile      on;
     keepalive_timeout 65;
 
-    # Gzip圧縮の有効化
     gzip on;
     gzip_disable "msie6";
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 
-    # HTTPサーバー（リダイレクト用）
     server {
         listen 80;
         server_name ${NGINX_SERVER_NAME};
 
-        # Let's Encrypt 用ディレクトリ
         location /.well-known/acme-challenge/ {
             root /var/www/html;
         }
 
-        # HTTPSへのリダイレクト
         location / {
             return 301 https://$host$request_uri;
         }
     }
 
-    # HTTPSサーバー（メイン）
     server {
-        listen 443 ssl;  # SSL用ポート
-        http2 on;        # 明示的にHTTP/2を有効化
+        listen 443 ssl;
+        http2 on;      
         server_name ${NGINX_SERVER_NAME};
 
-        # SSL設定
         ssl_certificate /etc/letsencrypt/live/${NGINX_SERVER_NAME}/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/${NGINX_SERVER_NAME}/privkey.pem;
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_ciphers HIGH:!aNULL:!MD5;
         ssl_prefer_server_ciphers on;
-
-        # HSTS（Strict-Transport-Security）設定
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
-        # エラーページ
         error_page 404 /404.html;
         error_page 500 502 503 504 /50x.html;
-        location = /404.html {
-            root /usr/share/nginx/html;
-        }
-        location = /50x.html {
-            root /usr/share/nginx/html;
-        }
-
-        # プロキシ設定
+        location = /404.html { root /usr/share/nginx/html; }
+        location = /50x.html { root /usr/share/nginx/html; }
         location / {
             proxy_pass http://django:8000;
             proxy_set_header Host $host;

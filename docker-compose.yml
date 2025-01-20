@@ -46,11 +46,15 @@ services:
     build:
       context: ./websocket
     container_name: websocket
-    environment:
-      - WEBSOCKET_HOST=websocket
-      - WEBSOCKET_PORT=8001
     ports:
       - "8001:8001"
+
+  annotator:
+    build:
+      context: ./annotator
+    container_name: annotator
+    ports:
+      - "8002:8002"
 
   django:
     build:
@@ -60,6 +64,7 @@ services:
       - redis
       - postgres
       - websocket
+      - annotator
     environment:
       - DJANGO_HOST=django
       - DJANGO_PORT=8000
@@ -81,12 +86,10 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - WEBSOCKET_HOST=websocket
       - WEBSOCKET_PORT=8001
+      - ANNOTATOR_HOST=annotator
+      - ANNOTATOR_PORT=8002
     ports:
       - "8000:8000"
-    command: >
-      sh -c "python manage.py makemigrations && 
-             python manage.py migrate && 
-             python manage.py runserver 0.0.0.0:8000"
 
 volumes:
   certbot-data:
