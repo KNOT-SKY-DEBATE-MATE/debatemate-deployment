@@ -73,7 +73,7 @@ async def onconnect(
         if not connection.websockets:
 
             # Pop WebSocket connection
-            connections[namespace].pop(connection)
+            connections[namespace].pop(connection_id)
 
         # Remove namespace from connections
         if not connections[namespace]:
@@ -99,8 +99,6 @@ async def onmessage(
         namespace not in {"group", "meeting"},
         command not in {"message.create"}
     ]):
-        # Close WebSocket connection
-        await websocket.close()
 
         # Return
         return
